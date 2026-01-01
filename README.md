@@ -1,40 +1,50 @@
-# X64Dbg MCP Server (plugin)
-This project is a starting point for building an MCP (Memory Command Protocol) server plugin for x96/x64/x32dbg https://github.com/x64dbg/x64dbg/ using C# on the classic Windows-only .NET Framework platform (No ASP.NET Core hosting required).
+# X64Dbg MCP Server Plugin
 
-The plugin acts as a lightweight HTTP interface bridge between an MCP client and the debugger, allowing you to have an LLM MCP client interactively send commands to inspect memory, disassemble, query registers, manipulate labels/comments, and more—all remotely and programmatically.
+A Model Context Protocol (MCP) server plugin for [x64dbg](https://github.com/x64dbg/x64dbg) that enables AI-assisted reverse engineering. Built with C# on .NET Framework—no ASP.NET Core required.
 
-On top of essential bindings to the x64dbg debugger engine, this template offers a clean project structure, a built-in command system, and a simple HTTP listener that exposes your commands through a text-based API. 
-![image](https://github.com/user-attachments/assets/4b3c3a02-edc0-48e2-93eb-a8c1727b5017)
+This plugin creates a lightweight HTTP bridge between MCP clients and the x64dbg debugger, allowing LLM-powered tools to interactively inspect memory, disassemble code, query registers, manipulate labels/comments, and more—all remotely and programmatically.
+
+![Plugin Screenshot](https://github.com/user-attachments/assets/4b3c3a02-edc0-48e2-93eb-a8c1727b5017)
 
 ## Features
-* ✅ Self-hosted HTTP command interface (no ASP.NET Core required)
-* ✅ Lightweight, zero-dependency binary deployment
-* ✅ Modular commands with parameter mapping
-* ✅ Direct interaction with registers, memory, threads, disassembly
-* ✅ Bi-directional AI/LLM command support
-* ✅ Plugin reload without restarting x64dbg
-* ✅ Expression function and menu extension support
 
-## Cursor Support
-Cursor Connection:
+- ✅ Self-hosted HTTP server (no ASP.NET Core dependency)
+- ✅ Lightweight, zero-dependency deployment
+- ✅ Modular command system with parameter mapping
+- ✅ Direct access to registers, memory, threads, and disassembly
+- ✅ Bidirectional AI/LLM command support
+- ✅ Hot-reload plugins without restarting x64dbg
+- ✅ Expression function and menu extension support
+
+---
+
+## MCP Client Configuration
+
+### Cursor
+
+Add the following to your Cursor MCP configuration:
+
 ```json
 {
   "mcpServers": {
-    "AgentSmithers X64Dbg MCP Server": {
+    "x64Dbg MCP Server": {
       "url": "http://127.0.0.1:50300/sse"
     }
   }
 }
 ```
-![image](https://github.com/user-attachments/assets/22414a30-d41e-4c3d-9b4f-f168f0498736)
 
-![image](https://github.com/user-attachments/assets/53ba58e6-c97c-4c31-b57c-832951244951)
+![Cursor Configuration](https://github.com/user-attachments/assets/22414a30-d41e-4c3d-9b4f-f168f0498736)
 
-## Claude Desktop support
+![Cursor Demo](https://github.com/user-attachments/assets/53ba58e6-c97c-4c31-b57c-832951244951)
 
-### MCPProxy STIDO<->SSE Bridge required: https://github.com/AgentSmithers/MCPProxy-STDIO-to-SSE/tree/master
-Claude Configuration Connection:
-```
+### Claude Desktop
+
+> **Note:** Claude Desktop requires the [MCPProxy STDIO↔SSE Bridge](https://github.com/AgentSmithers/MCPProxy-STDIO-to-SSE/tree/master).
+
+Add the following to your Claude Desktop configuration:
+
+```json
 {
   "mcpServers": {
     "x64Dbg": {
@@ -44,182 +54,300 @@ Claude Configuration Connection:
   }
 }
 ```
-![image](https://github.com/user-attachments/assets/0b089015-2270-4b39-ae23-42ce4322ba75)
 
+![Claude Desktop Configuration](https://github.com/user-attachments/assets/0b089015-2270-4b39-ae23-42ce4322ba75)
 
-![image](https://github.com/user-attachments/assets/3ef4cb69-0640-4ea0-b313-d007cdb003a8)
+![Claude Desktop Demo](https://github.com/user-attachments/assets/3ef4cb69-0640-4ea0-b313-d007cdb003a8)
 
+### Windsurf
 
-## Windsurf support
+> **Note:** Windsurf requires the [MCPProxy STDIO↔SSE Bridge](https://github.com/AgentSmithers/MCPProxy-STDIO-to-SSE/tree/master).
+>
+> **Known Issue:** Direct SSE connections may experience "context deadline exceeded" timeout errors.
 
-### MCPProxy STIDO<->SSE Bridge required: https://github.com/AgentSmithers/MCPProxy-STDIO-to-SSE/tree/master
-Claude Configuration Connection:
-```
+Add the following to your Windsurf configuration:
+
+```json
 {
   "mcpServers": {
-    "AgentSmithers x64Dbg STDIO<->SSE": {
+    "x64Dbg STDIO-SSE Bridge": {
       "command": "C:\\MCPProxy-STDIO-to-SSE.exe",
       "args": ["http://localhost:50300"]
     }
   }
 }
 ```
-![image](https://github.com/user-attachments/assets/df900c88-2291-47af-9789-1b17ff51cfa9)
 
-Known: Context deadline exceeded (timeout) issue with directly using SSE.
+![Windsurf Demo](https://github.com/user-attachments/assets/df900c88-2291-47af-9789-1b17ff51cfa9)
 
-# X64Dbg MCP Client - Need a client to sample?
-[mcp-csharp-sdk-client.zip](https://github.com/user-attachments/files/19697365/mcp-csharp-sdk-client.zip)
+---
 
-Open the project
-Edit line 590 in Program.cs and enter your GeminiAI key from Google Cloud API.
-Edit line 615 in Program.cs and enter in your MCP Server IP: Location = "http://192.168.x.x:50300/sse",
-Open your x96 debugger, your logs should reflect that the server automatically loaded.
-To interact with the server by hand instead of using the AI, uncomment line 634 and comment out line 635.
-Hit start debug on the client and the AI should automatically execute the Prompt located on line 434 (Program.cs)
+## Sample MCP Client
 
-![image](https://github.com/user-attachments/assets/ebf2ad81-0672-4ceb-be6e-a44c625cd6d0)
+Need a client to get started? Download the sample client:
 
-Access the latest sample client to use as a starting point of integration with this project: https://github.com/AgentSmithers/mcp-csharp-sdk-client/
+📦 [mcp-csharp-sdk-client.zip](https://github.com/user-attachments/files/19697365/mcp-csharp-sdk-client.zip)
 
-## Sample Conversations:
-### AI Tasked with loading a file, counting the internal modules and begin labeling important material functions.
-https://github.com/AgentSmithers/x64DbgMCPServer/blob/master/Sample1
+**Setup Instructions:**
 
-### Singleshot Speedhack identification
-https://github.com/AgentSmithers/x64DbgMCPServer/blob/master/Sample2
+1. Open the project in Visual Studio
+2. Edit `Program.cs` line 590: Enter your Google Cloud API Gemini key
+3. Edit `Program.cs` line 615: Set your MCP server IP (e.g., `http://192.168.x.x:50300/sse`)
+4. Open x64dbg, then start the MCP server manually via the Plugins menu before running the client
+5. (Optional) To interact manually instead of using AI, uncomment line 634 and comment out line 635
+6. Run the client—the AI will execute the prompt on line 434
 
-## Prerequisites
-To build and run this project, you'll need:
-- Visual Studio Build Tools (2019 v16.7 or later)
-- .NET Framework 4.7.2 SDK
-- 3F/DllExport
+![Sample Client](https://github.com/user-attachments/assets/ebf2ad81-0672-4ceb-be6e-a44c625cd6d0)
 
-## Getting Started
-Clone or fork the project: git clone https://github.com/AgentSmithers/x64DbgMCPServer
+**Latest Version:** [mcp-csharp-sdk-client on GitHub](https://github.com/AgentSmithers/mcp-csharp-sdk-client/)
 
-Download [DLlExport.bat](https://github.com/3F/DllExport/releases/download/1.8/DllExport.bat) and place it in the root folder of the project (Where the solutions[.sln] file is located). Then, run the `DllExport.bat`.
+---
 
-# For X86 / 32bit support, you must have .NET Framework 2.0 and .NET Framework 3.5 installed through "add/remove windows components" in Add or remove programed (appwiz.cpl).
+## Sample Conversations
 
-In the DllExport GUI,
-1. Check the `Installed` checkbox.
-2. Set the Namespace for DllExport to `System.Runtime.InteropServices`.
-3. Choose the target platform(`x64` or `x86`).
-4. Click Apply.
+### AI-Assisted Module Analysis
+The AI loads a file, counts internal modules, and labels important functions:
+- [View Sample 1](https://github.com/AgentSmithers/x64DbgMCPServer/blob/master/Sample1)
 
-<img width="518" height="462" alt="image" src="https://github.com/user-attachments/assets/5148316e-37fe-48d4-baec-73fb2ef1d3ed" />
+### Speed Hack Identification
+Single-shot speed hack detection:
+- [View Sample 2](https://github.com/AgentSmithers/x64DbgMCPServer/blob/master/Sample2)
 
-Open the .sln solution file and build.
+---
 
-If you get this error, clean and rebuild the DotNetPlugin.Stub
-<img width="998" height="155" alt="image" src="https://github.com/user-attachments/assets/a4bd8b06-3b35-4e3d-bdea-d7f8627178b3" />
+## Installation
 
+### Prerequisites
 
-📌 Tip: If you see `x64DbgMCPServer.dll` in the output folder, rename it to `x64DbgMCPServer.dp64` so that x64dbg can load the plugin.
+- **Visual Studio Build Tools** (2019 v16.7 or later)
+- **.NET Framework 4.7.2 SDK**
+- **[3F/DllExport](https://github.com/3F/DllExport)**
 
-copy the files (x64DbgMCPServer\bin\x64\Debug) into the x64DBG plugin (x96\release\x64\plugins\x64DbgMCPServer) folder to run.
-Note: If the plugin folder does not exist, create it and create a x64DbgMCPServer subfolder and copy the files within.
-![image](https://github.com/user-attachments/assets/8511452e-b65c-4bc8-83ff-885c384d0bbe)
+> **For x86/32-bit support:** You must install .NET Framework 2.0 and 3.5 via "Turn Windows features on or off" (`appwiz.cpl` → Add/Remove Windows Components).
 
-<img width="880" height="463" alt="image" src="https://github.com/user-attachments/assets/05994544-1b00-4b2d-9998-bf61c72b1425" />
+### Building from Source
 
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/AgentSmithers/x64DbgMCPServer
+   ```
 
-Sample Debug log when loaded
+2. **Download and run DllExport:**
+   - Download [DllExport.bat](https://github.com/3F/DllExport/releases/download/1.8/DllExport.bat)
+   - Place it in the root folder (where the `.sln` file is located)
+   - Run `DllExport.bat`
 
-![image](https://github.com/user-attachments/assets/02eb35d8-8584-46de-83c6-b535d23976b9)
+3. **Configure DllExport:**
+   - Check the `Installed` checkbox
+   - Set Namespace to `System.Runtime.InteropServices`
+   - Select target platform (`x64` or `x86`)
+   - Click **Apply**
 
-Start the Debugger, goto plugins -> Click "Start MCP Server"
+   <img width="518" alt="DllExport Configuration" src="https://github.com/user-attachments/assets/5148316e-37fe-48d4-baec-73fb2ef1d3ed" />
 
-Connect to it with your prefered MCP Client on port 50300 via SSE.
+4. **Build the solution:**
+   - Open the `.sln` file in Visual Studio
+   - Build the solution
 
-### Checking command results
+   > **Build Error?** If you encounter errors, try cleaning and rebuilding `DotNetPlugin.Stub` first.
+   >
+   > <img width="998" alt="Build Error" src="https://github.com/user-attachments/assets/a4bd8b06-3b35-4e3d-bdea-d7f8627178b3" />
 
-Some x64dbg commands don't return meaningful booleans. Use these helpers:
+### Installing the Plugin
 
-- ExecuteDebuggerCommandWithVar: run a command and read a debugger variable afterwards.
-  Example:
-  - `ExecuteDebuggerCommandWithVar command="init notepad.exe" resultVar=$pid pollMs=100 pollTimeoutMs=5000`
-  - Returns the value of `$pid` (e.g., `0x1234`) after init; non-zero means started
+1. **Rename the output file:**
+   - Locate `x64DbgMCPServer.dll` in `x64DbgMCPServer\bin\x64\Debug`
+   - Rename it to `x64DbgMCPServer.dp64` (or `.dp32` for 32-bit)
 
-- ExecuteDebuggerCommandWithOutput: run a command and capture the log output.
-  Example:
-  - `ExecuteDebuggerCommandWithOutput command="bplist"`
-  - Returns the log text produced by the command
+2. **Copy to x64dbg plugins folder:**
+   - Create the folder if it doesn't exist: `x64dbg\release\x64\plugins\x64DbgMCPServer`
+   - Copy all files from `bin\x64\Debug` to this folder
+
+   ![Plugin Installation](https://github.com/user-attachments/assets/8511452e-b65c-4bc8-83ff-885c384d0bbe)
+
+   <img width="880" alt="Installed Plugin" src="https://github.com/user-attachments/assets/05994544-1b00-4b2d-9998-bf61c72b1425" />
+
+3. **Unblock downloaded files:**
+   ```powershell
+   Unblock-File *
+   ```
+   > **Important:** Windows may block downloaded DLLs, preventing .NET Framework from loading them.
+
+---
+
+## Usage
+
+### Starting the Server
+
+1. Launch x64dbg
+2. Go to **Plugins** → **Start MCP Server**
+3. Connect with your preferred MCP client on port `50300` via SSE
+
+![Server Loaded](https://github.com/user-attachments/assets/02eb35d8-8584-46de-83c6-b535d23976b9)
+
+### Available Commands
+
+The following MCP tools are available for AI-assisted debugging and reverse engineering:
+
+#### Core Debugger Commands
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `ExecuteDebuggerCommand` | Execute any x64dbg command synchronously | `command=init c:\Path\To\Program.exe` |
+| `ExecuteDebuggerCommandWithVar` | Execute a command and return a debugger variable | `command=init notepad.exe, resultVar=$pid, pollMs=100, pollTimeoutMs=5000` |
+| `ExecuteDebuggerCommandWithOutput` | Execute a command and capture log output | `command="bplist"` |
+| `ListDebuggerCommands` | List available debugger commands by category | `subject=gui` (options: debugcontrol, gui, search, threadcontrol) |
+| `DbgValFromString` | Get a debugger variable/expression value | `value=$pid` |
+
+#### Memory Operations (Debug Session Required)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `ReadDismAtAddress` | Disassemble instructions at an address | `address=0x12345678, byteCount=100` |
+| `WriteMemToAddress` | Write bytes to a memory address | `address=0x12345678, byteString=0F FF 90` |
+
+#### Labels and Comments (Debug Session Required)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `GetLabel` | Get the label at a specific address | `addressStr=0x12345678` |
+| `CommentOrLabelAtAddress` | Add a label or comment at an address | `address=0x12345678, value=MyFunction, mode=Label` |
+
+#### Process Information (Debug Session Required)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `GetAllRegisters` | Get all CPU register values | — |
+| `GetAllActiveThreads` | List all active threads with details | — |
+| `GetAllModulesFromMemMap` | List all loaded modules from memory map | — |
+| `GetCallStack` | Get the current call stack | `maxFrames=32` |
+
+#### Breakpoints (Debug Session Required)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `GetBreakpointInfo` | Get breakpoint information using safe methods | — |
+
+#### File Operations (Debug Session Required)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `DumpModuleToFile` | Dump module info and disassembly to a file | `pfilepath=C:\Output.txt` |
+
+> **Note:** Commands marked "Debug Session Required" only work when x64dbg is actively debugging a process.
+
+#### Advanced Commands
+
+**`ExecuteDebuggerCommandWithVar`** — Run a command and read a debugger variable:
+```
+ExecuteDebuggerCommandWithVar command="init notepad.exe" resultVar=$pid pollMs=100 pollTimeoutMs=5000
+```
+Returns the value of `$pid` (e.g., `0x1234`) after initialization.
+
+**`ExecuteDebuggerCommandWithOutput`** — Run a command and capture log output:
+```
+ExecuteDebuggerCommandWithOutput command="bplist"
+```
+Returns the text output produced by the command.
+
+![Command Examples](https://github.com/user-attachments/assets/f954feab-4518-4368-8b0a-d6ec07212122)
+![Command Results](https://github.com/user-attachments/assets/2952e4eb-76ef-460c-9124-0e3c1167fa3d)
+
+---
 
 ## Troubleshooting
 
 ### "Access is denied" when starting MCP server
 
-If you see `Failed to start MCP server: Access is denied` in the x64dbg logs (Alt+L), this is because Windows requires special permissions to listen on HTTP URLs. You have two options:
+If you see `Failed to start MCP server: Access is denied` in the x64dbg logs (Alt+L), Windows requires special permissions to listen on HTTP URLs.
 
 **Option 1: Run as Administrator (Quick fix)**
-- Right-click `x64dbg.exe` and select "Run as administrator"
+- Right-click `x64dbg.exe` → **Run as administrator**
 
 **Option 2: Grant URL permissions (Recommended)**
-Run these commands in an elevated PowerShell/Command Prompt:
+
+Run these commands in an elevated PowerShell or Command Prompt:
 ```cmd
 netsh http add urlacl url=http://+:50300/sse/ user=Everyone
 netsh http add urlacl url=http://+:50300/message/ user=Everyone
 ```
 
-After running these commands, you can start x64dbg normally and the MCP server will work.
+After running these commands, x64dbg can be started normally.
 
-**Ensure that you run powershells "Unblock-File *" command to remove any sort of block on the downloaded files.**
+### Plugin fails to load / x64dbg crashes on startup
 
-### Sample Commands using the X64Dbg MCP Client
-I've validated several commands already and they are working wonders. I'm especially excited to be using this system to explore how AI-assisted reverse engineering could streamline security workflows.
-Once the MCP server is running (via the plugin menu in x64dbg), you can issue commands like:
+Ensure downloaded DLLs are not blocked by Windows:
+```powershell
+Get-ChildItem -Path "path\to\plugins" -Recurse | Unblock-File
 ```
-ExecuteDebuggerCommand command=init C:\InjectGetTickCount\InjectSpeed.exe
-ExecuteDebuggerCommand command="AddFavouriteCommand Log s, NameOfCmd"
-ReadDismAtAddress addressStr=0x000000014000153f, byteCount=5
-ReadMemAtAddress addressStr=00007FFA1AC81000, byteCount=5
-WriteMemToAddress addressStr=0x000000014000153f, byteString=90 90 90 90 90 90
-CommentOrLabelAtAddress addressStr=0x000000014000153f, value=Test, mode=Comment
-CommentOrLabelAtAddress addressStr=0x000000014000153f, value=
-GetAllRegisters
-GetLabel addressStr=0x000000014000153f
-GetAllActiveThreads
-GetAllModulesFromMemMap
-GetCallStack
-These commands return JSON or text-formatted output that's suitable for ingestion by AI models or integration scripts. Example:
-```
-![image](https://github.com/user-attachments/assets/f954feab-4518-4368-8b0a-d6ec07212122)
-![image](https://github.com/user-attachments/assets/2952e4eb-76ef-460c-9124-0e3c1167fa3d)
 
-## Debugging
-DotNetPlugin.Impl contains the following within the project build post commands. Update it to reflect the corret path to x64dbg for faster debugging.
-Upon rebuilding X64Dbg will autoload the new plugin and you can reattach to the X64Dbg instance if needed.
+Blocked files prevent .NET Framework from loading assemblies for security reasons.
+
+---
+
+## Development
+
+### Debugging Setup
+
+The `DotNetPlugin.Impl` project includes post-build commands for rapid iteration. Update the paths to match your x64dbg installation:
+
 ```
-xcopy /Y /I "$(TargetDir)*.*" "C:\Users\User\Desktop\x96\release\x64\plugins\x64DbgMCPServer"
-C:\Users\User\Desktop\x96\release\x64\x64dbg.exe
+xcopy /Y /I "$(TargetDir)*.*" "C:\path\to\x64dbg\plugins\x64DbgMCPServer"
+C:\path\to\x64dbg\x64dbg.exe
 ```
-## Actively working on implementing several functions
-Not every command is fully implemented althrough I am actively working on getting this project moving to support full stack, thread and module dumps for the AI to query.
+
+This automatically copies the plugin and launches x64dbg after each build.
+
+### Project Structure
+
+- **DotNetPlugin.Stub** — Native entry point for x64dbg
+- **DotNetPlugin.Impl** — Main plugin implementation
+- **DotNetPlugin.RemotingHelper** — Assembly remoting support
+
+---
 
 ## How It Works
-The MCP server runs a simple HTTP listener and routes incoming commands to C# methods marked with the [Command] attribute. These methods can perform any logic (e.g., memory reads, disassembly, setting breakpoints) and return data in a structured format back to a MCP client.
+
+The MCP server runs an `HttpListener` that routes incoming requests to C# methods marked with the `[Command]` attribute. These methods can perform any operation (memory reads, disassembly, breakpoints, etc.) and return structured data to MCP clients.
+
+```
+MCP Client  →  HTTP Request  →  HttpListener  →  [Command] Method  →  x64dbg API
+     ↑                                                                      |
+     └──────────────────────  JSON Response  ←──────────────────────────────┘
+```
+
+---
 
 ## Known Issues
-ExecuteDebuggerCommand always returns true as it pertains to the comment successfully being execute and not the results of the actual command.(Fix was implemented,needs checking.)\
-Currently the already compiled version is set to listen on all IP's on port 50300 thus requiring Administrative privileges. Future releases will look to detect this and will listen only on 127.0.0.1 so it may be used without administrative privileges.(See the `Troubleshooting` section)
 
-If upon launch x64/x32 dbg crashes, ensure the DLL's are not being blocked by windows.
-This causes .NET Framework to refuse loading the assemblies for security reasons.
+| Issue | Status |
+|-------|--------|
+| `ExecuteDebuggerCommand` always returns `true` (indicates command was dispatched, not result) | Fix implemented, needs verification |
+| Default configuration listens on all IPs (`+`), requiring admin privileges | See [Troubleshooting](#troubleshooting) for workarounds |
+| Some commands are not fully implemented | Active development |
 
-## Special thanks
-⚡ With the help of DotNetPluginCS by Adams85. That and roughly ~20 hours of focused coding, MCP Protocol review resulted in a decent proof-of-concept self-contained HTTP MCP server plugin for x64dbg.
+---
 
-## Integration Notes
-One of the most satisfying aspects of this project was overcoming the challenge of building an HTTP server entirely self-contained — no Kestrel, no ASP.NET, just raw HttpListener powering your reverse engineering automation.
+## Acknowledgments
 
-I plan to continue improving this codebase as part of my journey into AI-assisted analysis, implementation security, and automation tooling.
+⚡ Built with the help of [DotNetPluginCS](https://github.com/mrexodia/DotNetPluginCS) by Adams85.
 
-If you'd like help creating your own integration, extending this plugin, or discussing potential use cases — feel free to reach out (see contact info in the repo or my profile). I'm eager to collaborate and learn with others exploring this space.
+This project represents ~20 hours of focused development, MCP protocol review, and iteration to create a self-contained HTTP MCP server plugin for x64dbg—no Kestrel, no ASP.NET, just raw `HttpListener` powering reverse engineering automation.
 
-💻 Let's reverse engineer smarter. Not harder.
+---
 
-Cheers 🎉
+## Contributing
 
-Https://ControllingTheInter.net
+I'm actively improving this codebase as part of my exploration into AI-assisted analysis and security automation. If you'd like to:
+
+- Create your own integration
+- Extend this plugin
+- Discuss potential use cases
+
+Feel free to reach out via the repository or my profile. I'm eager to collaborate with others exploring this space.
+
+💻 **Let's reverse engineer smarter, not harder.**
+
+🎉 Cheers!
+
+🌐 [ControllingTheInter.net](https://ControllingTheInter.net)
